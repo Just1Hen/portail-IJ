@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTAIL INFO JEUNES — VÉRIFICATION SÉCURISÉE</title>
+    <!-- Chargement de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Police Inter pour un rendu moderne et lisible -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF7;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(23, 162, 184, 0.16) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 107, 74, 0.16) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 209, 102, 0.22) 0px, transparent 45%);
+            min-height: 100vh;
+            color: #1E293B;
+        }
+
+        /* Animation de secousse lors d'une saisie incorrecte */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            15%, 55% { transform: translateX(-8px); }
+            35%, 75% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Animation d'apparition de l'écran de validation */
+        @keyframes unlockPop {
+            0% { opacity: 0; transform: scale(0.88) translateY(12px); }
+            70% { transform: scale(1.02) translateY(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-unlock {
+            animation: unlockPop 0.5s ease-out forwards;
+        }
+
+        /* Halo lumineux autour du chiffre final */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0.75); }
+            50% { box-shadow: 0 0 0 16px rgba(255, 209, 102, 0); }
+        }
+        .glow-badge {
+            animation: pulseGlow 2.2s infinite;
+        }
+    </style>
+</head>
+<body class="text-[#1E293B] flex flex-col justify-between p-4 sm:p-6">
+
+    <!-- Conteneur principal centré -->
+    <main class="w-full max-w-lg mx-auto my-auto">
+        
+        <!-- Carte principale style Canva Info Jeunes -->
+        <div id="terminalCard" class="bg-[#FDFBF7] rounded-3xl shadow-xl border-2 border-[#1E293B]/15 overflow-hidden transition-all">
+            
+            <!-- En-tête moderne Info Jeunes -->
+            <header class="bg-[#17A2B8] text-white px-5 py-5 sm:px-7 sm:py-6 border-b-4 border-[#FFD166] relative">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <span class="inline-flex items-center gap-2 bg-[#FFD166] text-[#1E293B] font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-[#FF6B4A] animate-ping"></span>
+                        ACCÈS RESTREINT • ÉNIGME 7
+                    </span>
+                    <span class="text-xs font-mono font-bold text-[#1E293B] bg-white/95 px-2.5 py-0.5 rounded-lg">
+                        IJ-974
+                    </span>
+                </div>
+                <h1 class="text-lg sm:text-xl font-black tracking-tight leading-snug text-white">
+                    PORTAIL INFO JEUNES — VÉRIFICATION SÉCURISÉE
+                </h1>
+                <p class="text-xs sm:text-sm font-medium text-cyan-50 mt-1">
+                    Contrôle des coordonnées de la structure
+                </p>
+            </header>
+
+            <!-- Corps du portail -->
+            <div class="p-5 sm:p-7">
+                
+                <!-- Encadré d'instruction -->
+                <div id="instructionBox" class="bg-[#FFD166]/25 border border-[#FFD166] rounded-2xl p-4 mb-6 text-sm text-[#1E293B] leading-relaxed">
+                    <p class="font-bold text-[#1E293B] mb-1 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-[#FF6B4A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Authentification des indices requise
+                    </p>
+                    <p class="text-slate-700">
+                        Saisissez <strong>l'adresse postale</strong> et <strong>le numéro de téléphone</strong> trouvés dans la salle pour débloquer le code final.
+                    </p>
+                </div>
+
+                <!-- Formulaire de vérification -->
+                <form id="authForm" class="space-y-5" novalidate>
+                    
+                    <!-- Rubrique 1 : Adresse postale -->
+                    <div>
+                        <label for="addressInput" class="block text-sm font-bold text-[#1E293B] mb-1.5">
+                            Adresse postale
+                        </label>
+                        <input 
+                            type="text" 
+                            id="addressInput" 
+                            name="address"
+                            autocomplete="off"
+                            placeholder="Saisissez l'adresse complète..."
+                            class="w-full px-4 py-3.5 rounded-xl bg-white border-2 border-slate-300 focus:border-[#17A2B8] text-[#1E293B] font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#17A2B8]/20 transition-all"
+                            required
+                        >
+                    </div>
+
+                    <!-- Rubrique 2 : Numéro de téléphone -->
+                    <div>
+                        <label for="phoneInput" class="block text-sm font-bold text-[#1E293B] mb-1.5">
+                            Numéro de téléphone
+                        </label>
+                        <input 
+                            type="tel" 
+                            id="phoneInput" 
+                            name="phone"
+                            autocomplete="off"
+                            placeholder="Saisissez le numéro de téléphone..."
+                            class="w-full px-4 py-3.5 rounded-xl bg-white border-2 border-slate-300 focus:border-[#17A2B8] text-[#1E293B] font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#17A2B8]/20 transition-all"
+                            required
+                        >
+                    </div>
+
+                    <!-- Bannière d'erreur générique (cachée par défaut) -->
+                    <div id="errorBox" class="hidden rounded-xl bg-red-50 border border-red-300 p-3.5 text-sm text-red-700" role="alert">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <p id="errorMessage" class="font-semibold text-red-700">
+                                Réponse incorrecte, veuillez réessayer.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bouton de soumission -->
+                    <button 
+                        type="submit" 
+                        class="w-full py-3.5 px-6 rounded-xl bg-[#FF6B4A] hover:bg-[#f25a38] active:scale-[0.99] text-white font-extrabold text-sm sm:text-base tracking-wide uppercase shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        Valider
+                    </button>
+                </form>
+
+                <!-- Écran de succès (caché par défaut) -->
+                <div id="successScreen" class="hidden animate-unlock text-center py-3">
+                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#17A2B8]/15 text-[#17A2B8] mb-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+
+                    <p class="text-sm sm:text-base font-bold text-[#17A2B8] mb-5">
+                        Accès autorisé — Code de sécurité validé
+                    </p>
+
+                    <!-- Badge lumineux révélant le chiffre 0 -->
+                    <div class="bg-[#1E293B] text-white rounded-3xl p-7 border-4 border-[#FFD166] glow-badge shadow-lg">
+                        <div id="finalCodeDisplay" class="text-8xl sm:text-9xl font-black text-white tracking-tighter select-all py-2 leading-none">
+                            0
+                        </div>
+                    </div>
+
+                    <!-- Bouton discret pour réinitialiser le portail -->
+                    <button 
+                        type="button" 
+                        id="resetSessionBtn"
+                        class="mt-6 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-[#1E293B] bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer px-3.5 py-2 transition-colors"
+                    >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Réinitialiser
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Pied de page discret avec accès au Mode Animateur -->
+    <footer class="w-full max-w-lg mx-auto mt-6 text-center">
+        <button 
+            type="button" 
+            id="openAdminBtn"
+            class="text-xs font-medium text-slate-400 hover:text-[#1E293B] transition-colors py-2 px-3 rounded-lg cursor-pointer"
+        >
+            Mode Animateur
+        </button>
+    </footer>
+
+    <!-- Modale Mode Animateur -->
+    <div id="adminModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-[#FDFBF7] w-full max-w-md rounded-2xl border border-slate-300 shadow-2xl overflow-hidden">
+            <div class="bg-[#1E293B] text-white px-5 py-4 flex items-center justify-between border-b-2 border-[#FFD166]">
+                <h3 class="font-bold text-sm uppercase tracking-wider text-[#FFD166]">
+                    Mode Animateur — Tests & Personnalisation
+                </h3>
+                <button type="button" id="closeAdminBtn" class="text-slate-300 hover:text-white p-1 cursor-pointer" aria-label="Fermer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-4 text-xs sm:text-sm text-[#1E293B]">
+                <!-- Tests rapides -->
+                <div>
+                    <p class="font-bold text-[#17A2B8] uppercase text-xs mb-2">Tests rapides dans le formulaire :</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button 
+                            type="button" 
+                            id="testStandardBtn"
+                            class="px-3 py-2 rounded-lg bg-[#17A2B8] hover:bg-cyan-700 text-white font-semibold text-xs cursor-pointer transition-colors"
+                        >
+                            Standard + espaces
+                        </button>
+                        <button 
+                            type="button" 
+                            id="testCompactBtn"
+                            class="px-3 py-2 rounded-lg bg-[#17A2B8]/15 hover:bg-[#17A2B8]/25 text-[#1E293B] font-semibold text-xs cursor-pointer transition-colors"
+                        >
+                            Sans espaces (0262...)
+                        </button>
+                        <button 
+                            type="button" 
+                            id="testPrefixBtn"
+                            class="px-3 py-2 rounded-lg bg-[#FFD166] hover:bg-amber-300 text-[#1E293B] font-semibold text-xs cursor-pointer transition-colors"
+                        >
+                            Préfixe +262 & fautes
+                        </button>
+                        <button 
+                            type="button" 
+                            id="testPrefixZeroBtn"
+                            class="px-3 py-2 rounded-lg bg-[#FFD166]/60 hover:bg-[#FFD166] text-[#1E293B] font-semibold text-xs cursor-pointer transition-colors"
+                        >
+                            Préfixe +262 (0)2...
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Personnalisation des valeurs attendues -->
+                <div class="border-t border-slate-200 pt-3 space-y-2.5">
+                    <p class="font-bold text-[#17A2B8] uppercase text-xs">Personnaliser les valeurs attendues :</p>
+                    <div>
+                        <label for="adminAddressInput" class="block text-xs font-semibold text-slate-600 mb-1">Adresse attendue</label>
+                        <input type="text" id="adminAddressInput" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-xs font-medium">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="adminPhoneInput" class="block text-xs font-semibold text-slate-600 mb-1">Téléphone attendu</label>
+                            <input type="text" id="adminPhoneInput" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-xs font-medium">
+                        </div>
+                        <div>
+                            <label for="adminCodeInput" class="block text-xs font-semibold text-slate-600 mb-1">Code final affiché</label>
+                            <input type="text" id="adminCodeInput" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-xs font-medium">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <button 
+                            type="button" 
+                            id="saveAdminConfigBtn"
+                            class="px-3.5 py-2 rounded-lg bg-[#FF6B4A] hover:bg-[#f25a38] text-white font-bold text-xs cursor-pointer transition-colors"
+                        >
+                            Enregistrer la configuration
+                        </button>
+                        <button 
+                            type="button" 
+                            id="adminResetBtn"
+                            class="px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-[#1E293B] font-semibold text-xs cursor-pointer transition-colors"
+                        >
+                            Réinitialiser tout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Configuration cible par défaut (modifiable via le Mode Animateur)
+         */
+        const DEFAULT_CONFIG = {
+            address: "42 Bis Route de la Ravine Seche, Les Avirons 97425, La Réunion",
+            phone: "02 62 45 49 38",
+            code: "0"
+        };
+
+        let activeConfig = { ...DEFAULT_CONFIG };
+
+        // Mots-clés essentiels pour l'adresse par défaut (avec tolérance Levenshtein <= 2 sur les mots longs)
+        const DEFAULT_ESSENTIAL_KEYWORDS = [
+            { word: "42", maxDist: 0 },
+            { word: "bis", maxDist: 1 },
+            { word: "ravine", maxDist: 2 },
+            { word: "seche", maxDist: 2 },
+            { word: "avirons", maxDist: 2 },
+            { word: "97425", maxDist: 0 }
+        ];
+
+        /**
+         * Calcule la distance d'édition de Levenshtein entre deux chaînes
+         */
+        function levenshteinDistance(a, b) {
+            if (a === b) return 0;
+            if (!a.length) return b.length;
+            if (!b.length) return a.length;
+
+            const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+            for (let j = 0; j <= b.length; j++) {
+                matrix[0][j] = j;
+            }
+
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j - 1] + cost
+                    );
+                }
+            }
+            return matrix[a.length][b.length];
+        }
+
+        /**
+         * Normalise une adresse selon les règles permissives :
+         * - Minuscules + suppression des accents
+         * - Suppression de toute ponctuation (virgules, points, tirets, apostrophes, parenthèses, slashs)
+         * - Normalisation des abréviations courantes ('42bis'/'42 b', 'rte'/'rt', 'av', 'bd', 'ch', 'imp', 'st', 'ste')
+         */
+        function normalizeAddress(rawInput) {
+            let text = String(rawInput || "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[,.\-_'’"()\/\\;:!?]+/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+            // Sépare un numéro collé à "bis" ou "b" (ex: "42bis" -> "42 bis", "42b" -> "42 bis")
+            text = text.replace(/\b(\d+)\s*(bis|b)\b/g, "$1 bis");
+
+            // Normalise les abréviations courantes mot par mot
+            const abbreviations = {
+                "rte": "route",
+                "rt": "route",
+                "av": "avenue",
+                "ave": "avenue",
+                "bd": "boulevard",
+                "bvd": "boulevard",
+                "ch": "chemin",
+                "chem": "chemin",
+                "imp": "impasse",
+                "st": "saint",
+                "ste": "sainte"
+            };
+
+            return text
+                .split(" ")
+                .filter(Boolean)
+                .map(token => abbreviations[token] || token)
+                .join(" ");
+        }
+
+        /**
+         * Vérifie si l'adresse saisie correspond à l'adresse attendue de façon très souple
+         */
+        function isAddressValid(rawInput) {
+            const normalized = normalizeAddress(rawInput);
+            if (!normalized) return false;
+
+            const isDefaultAddress = normalizeAddress(activeConfig.address) === normalizeAddress(DEFAULT_CONFIG.address);
+
+            if (isDefaultAddress) {
+                const variants = [
+                    "42 bis route de la ravine seche les avirons 97425 la reunion",
+                    "42 bis route de la ravine seche les avirons 97425 reunion",
+                    "42 bis route de la ravine seche les avirons 97425",
+                    "42 bis route de la ravine seche 97425 les avirons la reunion",
+                    "42 bis route de la ravine seche 97425 les avirons reunion",
+                    "42 bis route de la ravine seche 97425 les avirons"
+                ];
+
+                for (const variant of variants) {
+                    if (levenshteinDistance(normalized, variant) <= 5) {
+                        return true;
+                    }
+                }
+
+                // Vérification souple par mots-clés (tolérance <= 1 ou 2 par mot-clé alphabétique)
+                const tokens = normalized.split(" ");
+                return DEFAULT_ESSENTIAL_KEYWORDS.every(({ word, maxDist }) => {
+                    if (maxDist === 0) {
+                        return tokens.includes(word);
+                    }
+                    return tokens.some(token => levenshteinDistance(token, word) <= maxDist);
+                });
+            }
+
+            // Si l'animateur a personnalisé une autre adresse
+            const targetNorm = normalizeAddress(activeConfig.address);
+            if (levenshteinDistance(normalized, targetNorm) <= 4) return true;
+
+            const targetTokens = targetNorm.split(" ").filter(t => t.length > 2 || /^\d+$/.test(t));
+            const inputTokens = normalized.split(" ");
+            return targetTokens.every(t => {
+                if (/^\d+$/.test(t)) return inputTokens.includes(t);
+                return inputTokens.some(tok => levenshteinDistance(tok, t) <= 1);
+            });
+        }
+
+        /**
+         * Normalise un numéro de téléphone réunionnais / français en extrayant uniquement les chiffres
+         * et en convertissant les préfixes internationaux (+262, 00262, 262, +262 (0), etc.) en 0 local.
+         */
+        function normalizePhoneDigits(rawInput) {
+            let digits = String(rawInput || "").replace(/\D/g, "");
+            if (!digits) return "";
+
+            // Cas 00262... (ex: 00262262454938 -> 0262454938 ou 002620262454938 -> 0262454938)
+            if (digits.startsWith("00262")) {
+                const rest = digits.slice(5);
+                digits = rest.startsWith("0") ? rest : "0" + rest;
+            }
+            // Cas +262... ou 262... (ex: 262262454938 -> 0262454938 ou 2620262454938 -> 0262454938)
+            else if (digits.startsWith("262") && digits.length >= 12) {
+                const rest = digits.slice(3);
+                digits = rest.startsWith("0") ? rest : "0" + rest;
+            }
+
+            return digits;
+        }
+
+        /**
+         * Vérifie si le numéro de téléphone correspond à la cible (accepte espaces, tirets, points, préfixes ou non)
+         */
+        function isPhoneValid(rawInput) {
+            const inputDigits = normalizePhoneDigits(rawInput);
+            const targetDigits = normalizePhoneDigits(activeConfig.phone);
+            return Boolean(inputDigits) && inputDigits === targetDigits;
+        }
+
+        // Références DOM
+        const terminalCard = document.getElementById("terminalCard");
+        const authForm = document.getElementById("authForm");
+        const addressInput = document.getElementById("addressInput");
+        const phoneInput = document.getElementById("phoneInput");
+        const errorBox = document.getElementById("errorBox");
+        const errorMessage = document.getElementById("errorMessage");
+        const instructionBox = document.getElementById("instructionBox");
+        const successScreen = document.getElementById("successScreen");
+        const finalCodeDisplay = document.getElementById("finalCodeDisplay");
+        const resetSessionBtn = document.getElementById("resetSessionBtn");
+
+        // Modale Animateur
+        const adminModal = document.getElementById("adminModal");
+        const openAdminBtn = document.getElementById("openAdminBtn");
+        const closeAdminBtn = document.getElementById("closeAdminBtn");
+        const testStandardBtn = document.getElementById("testStandardBtn");
+        const testCompactBtn = document.getElementById("testCompactBtn");
+        const testPrefixBtn = document.getElementById("testPrefixBtn");
+        const testPrefixZeroBtn = document.getElementById("testPrefixZeroBtn");
+        const adminAddressInput = document.getElementById("adminAddressInput");
+        const adminPhoneInput = document.getElementById("adminPhoneInput");
+        const adminCodeInput = document.getElementById("adminCodeInput");
+        const saveAdminConfigBtn = document.getElementById("saveAdminConfigBtn");
+        const adminResetBtn = document.getElementById("adminResetBtn");
+
+        function triggerShake() {
+            terminalCard.classList.remove("animate-shake");
+            void terminalCard.offsetWidth;
+            terminalCard.classList.add("animate-shake");
+        }
+
+        function clearFieldErrors() {
+            errorBox.classList.add("hidden");
+        }
+
+        function resetPortal() {
+            addressInput.value = "";
+            phoneInput.value = "";
+            clearFieldErrors();
+            successScreen.classList.add("hidden");
+            instructionBox.classList.remove("hidden");
+            authForm.classList.remove("hidden");
+        }
+
+        function syncAdminInputs() {
+            adminAddressInput.value = activeConfig.address;
+            adminPhoneInput.value = activeConfig.phone;
+            adminCodeInput.value = activeConfig.code;
+        }
+
+        // Soumission du formulaire principal
+        authForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            clearFieldErrors();
+
+            const addressOk = isAddressValid(addressInput.value);
+            const phoneOk = isPhoneValid(phoneInput.value);
+
+            if (addressOk && phoneOk) {
+                finalCodeDisplay.textContent = activeConfig.code;
+                authForm.classList.add("hidden");
+                instructionBox.classList.add("hidden");
+                successScreen.classList.remove("hidden");
+            } else {
+                triggerShake();
+                errorMessage.textContent = "Réponse incorrecte, veuillez réessayer.";
+                errorBox.classList.remove("hidden");
+            }
+        });
+
+        addressInput.addEventListener("input", clearFieldErrors);
+        phoneInput.addEventListener("input", clearFieldErrors);
+        resetSessionBtn.addEventListener("click", resetPortal);
+
+        // Gestion de la modale Mode Animateur
+        openAdminBtn.addEventListener("click", () => {
+            syncAdminInputs();
+            adminModal.classList.remove("hidden");
+        });
+        closeAdminBtn.addEventListener("click", () => adminModal.classList.add("hidden"));
+        adminModal.addEventListener("click", (e) => {
+            if (e.target === adminModal) adminModal.classList.add("hidden");
+        });
+
+        testStandardBtn.addEventListener("click", () => {
+            resetPortal();
+            addressInput.value = "42 Bis Route de la Ravine Seche, Les Avirons 97425, La Réunion";
+            phoneInput.value = "02 62 45 49 38";
+            adminModal.classList.add("hidden");
+        });
+
+        testCompactBtn.addEventListener("click", () => {
+            resetPortal();
+            addressInput.value = "42bis rte de la ravine seche 97425 les avirons";
+            phoneInput.value = "0262454938";
+            adminModal.classList.add("hidden");
+        });
+
+        testPrefixBtn.addEventListener("click", () => {
+            resetPortal();
+            addressInput.value = "42 b route de la ravin sech aviron 97425";
+            phoneInput.value = "+262 262 45 49 38";
+            adminModal.classList.add("hidden");
+        });
+
+        testPrefixZeroBtn.addEventListener("click", () => {
+            resetPortal();
+            addressInput.value = "42 bis route de la ravine seche, 97425 les avirons";
+            phoneInput.value = "+262 (0)2 62 45 49 38";
+            adminModal.classList.add("hidden");
+        });
+
+        saveAdminConfigBtn.addEventListener("click", () => {
+            const newAddr = adminAddressInput.value.trim();
+            const newPhone = adminPhoneInput.value.trim();
+            const newCode = adminCodeInput.value.trim();
+            if (newAddr) activeConfig.address = newAddr;
+            if (newPhone) activeConfig.phone = newPhone;
+            if (newCode !== "") activeConfig.code = newCode;
+            resetPortal();
+            adminModal.classList.add("hidden");
+        });
+
+        adminResetBtn.addEventListener("click", () => {
+            activeConfig = { ...DEFAULT_CONFIG };
+            syncAdminInputs();
+            resetPortal();
+            adminModal.classList.add("hidden");
+        });
+    </script>
+</body>
+</html>
